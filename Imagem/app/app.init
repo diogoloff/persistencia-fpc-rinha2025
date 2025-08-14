@@ -1,0 +1,31 @@
+#!/bin/bash
+set -e
+
+APPSERVICE=/opt/rinha/RinhaPersistencia
+runDir=/var/run/app
+mkdir -p $runDir
+pidfile="$runDir/RinhaPersistencia.pid"
+
+cleanup() {
+  echo "Stopping RinhaPersistencia Server..."
+  kill -USR1 $(pidof $APPSERVICE)
+  for i in $(seq 1 120); do
+    if ! pidof $APPSERVICE > /dev/null; then
+      echo "RinhaPersistencia Server Stopped"
+      exit 0
+    fi
+    sleep 1
+  done
+  echo "*** RinhaPersistencia Server Locked ***"
+  exit 1
+}
+
+trap cleanup SIGINT SIGTERM
+
+echo "Starting RinhaPersistencia Server..."
+$APPSERVICE -path:/opt/rinha/ -daemon N -pidfile "$pidfile" &
+
+# Aguarda indefinidamente enquanto monitora o processo
+while pidof $APPSERVICE > /dev/null; do
+  sleep 5
+done

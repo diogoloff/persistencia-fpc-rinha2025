@@ -1,0 +1,23 @@
+services:
+  persistencia: 
+    image: diogoloff/persistencia-fpc-rinha2025:latest
+    hostname: persistencia
+    ports:
+      - "9090:9090"
+    environment:
+      - NUM_WORKERS_SOCKET=32
+      - DEBUG=N
+#    volumes:
+#      - ./LogsP/:/opt/rinha/Logs/ #somente se DEBUG=S
+    networks:
+      - backend-rinha
+    #deploy:
+    #  resources:
+    #    limits:
+    #      cpus: "0.35"
+    #      memory: "100MB"
+
+networks:
+  backend-rinha:
+    name: backend-rinha
+    driver: bridge
